@@ -527,7 +527,7 @@
 
     logoutBtn.addEventListener('click', function () {
       sb.auth.signOut().then(function () {
-        resetToLogin();
+        window.location.href = 'index.html';
       });
     });
 
