@@ -66,6 +66,17 @@
 
     <form id="newCommentForm" class="comment-form">
       <input type="text" id="newAuthor" placeholder="Votre prénom" maxlength="60" required>
+      <div class="editor-toolbar">
+        <button type="button" class="editor-btn" data-wrap="bold" title="Gras"><b>G</b></button>
+        <button type="button" class="editor-btn" data-wrap="italic" title="Italique"><i>I</i></button>
+        <button type="button" class="editor-btn" data-wrap="underline" title="Souligné"><u>S</u></button>
+        <span class="editor-sep"></span>
+        <button type="button" class="editor-color-btn" data-color="#0b5b64" title="Texte teal" style="background:#0b5b64"></button>
+        <button type="button" class="editor-color-btn" data-color="#f5821f" title="Texte orange" style="background:#f5821f"></button>
+        <button type="button" class="editor-color-btn" data-color="#c0392b" title="Texte rouge" style="background:#c0392b"></button>
+        <button type="button" class="editor-color-btn" data-color="#1e824c" title="Texte vert" style="background:#1e824c"></button>
+      </div>
+      <p class="editor-hint">Sélectionnez du texte, puis cliquez sur un bouton pour le mettre en forme.</p>
       <textarea id="newBody" placeholder="Votre commentaire, suggestion ou recommandation…" maxlength="4000" rows="3" required></textarea>
       <button type="submit" class="btn btn-primary">Publier</button>
       <p id="newCommentError" class="gate-error" hidden>Une erreur est survenue. Réessayez.</p>
@@ -153,6 +164,91 @@
 
     var currentPassword = null;
 
+    // --- Mise en forme du texte : balisage simple, jamais de HTML brut ---
+    // Le texte est stocké tel quel (**gras**, _italique_, ++souligné++,
+    // [c:#hex]couleur[/c]) et interprété uniquement à l'affichage, en
+    // construisant des noeuds DOM directement (aucune insertion HTML,
+    // donc aucun risque d'injection quel que soit le contenu tapé).
+    var FORMAT_REGEX = /\*\*([^*]+)\*\*|_([^_]+)_|\+\+([^+]+)\+\+|\[c:(#[0-9a-fA-F]{6})\]([^\[]+)\[\/c\]/g;
+
+    function toolbarHTML() {
+      return '<div class="editor-toolbar">' +
+        '<button type="button" class="editor-btn" data-wrap="bold" title="Gras"><b>G</b></button>' +
+        '<button type="button" class="editor-btn" data-wrap="italic" title="Italique"><i>I</i></button>' +
+        '<button type="button" class="editor-btn" data-wrap="underline" title="Souligné"><u>S</u></button>' +
+        '<span class="editor-sep"></span>' +
+        '<button type="button" class="editor-color-btn" data-color="#0b5b64" title="Texte teal" style="background:#0b5b64"></button>' +
+        '<button type="button" class="editor-color-btn" data-color="#f5821f" title="Texte orange" style="background:#f5821f"></button>' +
+        '<button type="button" class="editor-color-btn" data-color="#c0392b" title="Texte rouge" style="background:#c0392b"></button>' +
+        '<button type="button" class="editor-color-btn" data-color="#1e824c" title="Texte vert" style="background:#1e824c"></button>' +
+        '</div>';
+    }
+
+    function wrapSelection(textarea, before, after) {
+      var start = textarea.selectionStart;
+      var end = textarea.selectionEnd;
+      var value = textarea.value;
+      var selected = value.slice(start, end) || 'texte';
+      textarea.value = value.slice(0, start) + before + selected + after + value.slice(end);
+      textarea.focus();
+      var newStart = start + before.length;
+      textarea.setSelectionRange(newStart, newStart + selected.length);
+    }
+
+    function initToolbar(scope) {
+      var textarea = scope.querySelector('textarea');
+      if (!textarea) return;
+      scope.querySelectorAll('.editor-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var kind = btn.getAttribute('data-wrap');
+          if (kind === 'bold') wrapSelection(textarea, '**', '**');
+          else if (kind === 'italic') wrapSelection(textarea, '_', '_');
+          else if (kind === 'underline') wrapSelection(textarea, '++', '++');
+        });
+      });
+      scope.querySelectorAll('.editor-color-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var color = btn.getAttribute('data-color');
+          wrapSelection(textarea, '[c:' + color + ']', '[/c]');
+        });
+      });
+    }
+
+    function renderFormattedBody(container, text) {
+      container.textContent = '';
+      var lastIndex = 0;
+      var match;
+      FORMAT_REGEX.lastIndex = 0;
+      while ((match = FORMAT_REGEX.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+        }
+        if (match[1] !== undefined) {
+          var strong = document.createElement('strong');
+          strong.textContent = match[1];
+          container.appendChild(strong);
+        } else if (match[2] !== undefined) {
+          var em = document.createElement('em');
+          em.textContent = match[2];
+          container.appendChild(em);
+        } else if (match[3] !== undefined) {
+          var u = document.createElement('span');
+          u.style.textDecoration = 'underline';
+          u.textContent = match[3];
+          container.appendChild(u);
+        } else if (match[4] !== undefined) {
+          var span = document.createElement('span');
+          span.style.color = match[4];
+          span.textContent = match[5];
+          container.appendChild(span);
+        }
+        lastIndex = FORMAT_REGEX.lastIndex;
+      }
+      if (lastIndex < text.length) {
+        container.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+    }
+
     function call(action, extra) {
       var body = Object.assign({ password: currentPassword, action: action }, extra || {});
       return fetch(API_URL, {
@@ -218,7 +314,7 @@
 
       var body = document.createElement('p');
       body.className = 'comment-body';
-      body.textContent = c.body;
+      renderFormattedBody(body, c.body);
       card.appendChild(body);
 
       var replyToggle = document.createElement('button');
@@ -232,9 +328,11 @@
       replyForm.hidden = true;
       replyForm.innerHTML =
         '<input type="text" placeholder="Votre prénom" maxlength="60" required>' +
+        toolbarHTML() +
         '<textarea placeholder="Votre réponse…" maxlength="4000" rows="2" required></textarea>' +
         '<button type="submit" class="btn btn-secondary">Répondre</button>';
       card.appendChild(replyForm);
+      initToolbar(replyForm);
 
       replyToggle.addEventListener('click', function () {
         replyForm.hidden = !replyForm.hidden;
@@ -312,6 +410,8 @@
         .catch(function () { newCommentError.hidden = false; })
         .then(function () { btn.disabled = false; });
     });
+
+    initToolbar(newCommentForm);
 
     // Tentative de connexion silencieuse si un mot de passe est déjà mémorisé.
     var saved = null;
