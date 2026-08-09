@@ -254,6 +254,7 @@
     var currentUser = null;
     var currentProfile = null;
     var selectedAvatarColor = AVATAR_COLORS[0];
+    var reactionsByComment = {};
 
     // --- Mise en forme du texte : balisage simple, jamais de HTML brut ---
     var FORMAT_REGEX = /\*\*([^*]+)\*\*|_([^_]+)_|\+\+([^+]+)\+\+|\[c:(#[0-9a-fA-F]{6})\]([^\[]+)\[\/c\]/g;
@@ -564,6 +565,64 @@
       return (c.profiles && c.profiles.avatar_color) || '#0b5b64';
     }
 
+    var STATUS_LABELS = {
+      nouveau: 'Nouveau',
+      en_cours: 'En cours',
+      corrige: 'Corrigé'
+    };
+
+    function makeStatusBadge(status) {
+      var badge = document.createElement('span');
+      badge.className = 'status-badge status-' + status;
+      badge.textContent = STATUS_LABELS[status] || status;
+      return badge;
+    }
+
+    function makeAdminStatusControl(c) {
+      var select = document.createElement('select');
+      select.className = 'status-select';
+      Object.keys(STATUS_LABELS).forEach(function (key) {
+        var opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = STATUS_LABELS[key];
+        if (key === c.status) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', function () {
+        select.disabled = true;
+        sb.from('forum_comments').update({ status: select.value }).eq('id', c.id).then(function (res) {
+          if (res.error) throw res.error;
+          return loadComments();
+        }).catch(function (err) {
+          console.error(err);
+          select.disabled = false;
+        });
+      });
+      return select;
+    }
+
+    function makeReactionButton(c) {
+      var info = reactionsByComment[c.id] || { count: 0, mine: false };
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'reaction-btn' + (info.mine ? ' reaction-btn-active' : '');
+      btn.textContent = '👍 Moi aussi' + (info.count > 0 ? ' (' + info.count + ')' : '');
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        var action = info.mine
+          ? sb.from('forum_reactions').delete().eq('comment_id', c.id).eq('user_id', currentUser.id)
+          : sb.from('forum_reactions').insert({ comment_id: c.id, user_id: currentUser.id });
+        action.then(function (res) {
+          if (res.error) throw res.error;
+          return loadComments();
+        }).catch(function (err) {
+          console.error(err);
+          btn.disabled = false;
+        });
+      });
+      return btn;
+    }
+
     function renderComment(c, depth) {
       var card = document.createElement('div');
       card.className = 'comment-card';
@@ -583,6 +642,7 @@
       metaText.appendChild(nameSpan);
       metaText.appendChild(dateSpan);
       authorRow.appendChild(metaText);
+      authorRow.appendChild(makeStatusBadge(c.status || 'nouveau'));
       card.appendChild(authorRow);
 
       var body = document.createElement('p');
@@ -590,11 +650,22 @@
       renderFormattedBody(body, c.body);
       card.appendChild(body);
 
+      var actionRow = document.createElement('div');
+      actionRow.className = 'comment-actions';
+
       var replyToggle = document.createElement('button');
       replyToggle.type = 'button';
       replyToggle.className = 'reply-toggle';
       replyToggle.textContent = 'Répondre';
-      card.appendChild(replyToggle);
+      actionRow.appendChild(replyToggle);
+
+      actionRow.appendChild(makeReactionButton(c));
+
+      if (currentProfile && currentProfile.is_admin) {
+        actionRow.appendChild(makeAdminStatusControl(c));
+      }
+
+      card.appendChild(actionRow);
 
       var replyForm = document.createElement('form');
       replyForm.className = 'comment-form reply-form';
@@ -655,16 +726,30 @@
 
     function loadComments() {
       commentListLoading.hidden = false;
-      return sb.from('forum_comments')
-        .select('id, body, parent_id, created_at, author_id, profiles(display_name, avatar_color)')
-        .order('created_at', { ascending: true })
-        .then(function (res) {
-          if (res.error) throw res.error;
-          renderComments(res.data || []);
-        }).catch(function (err) {
-          console.error(err);
-          commentListLoading.hidden = true;
+      return Promise.all([
+        sb.from('forum_comments')
+          .select('id, body, parent_id, created_at, author_id, status, profiles(display_name, avatar_color)')
+          .order('created_at', { ascending: true }),
+        sb.from('forum_reactions').select('comment_id, user_id')
+      ]).then(function (results) {
+        var commentsRes = results[0];
+        var reactionsRes = results[1];
+        if (commentsRes.error) throw commentsRes.error;
+        if (reactionsRes.error) throw reactionsRes.error;
+
+        reactionsByComment = {};
+        (reactionsRes.data || []).forEach(function (r) {
+          var entry = reactionsByComment[r.comment_id] || { count: 0, mine: false };
+          entry.count += 1;
+          if (r.user_id === currentUser.id) entry.mine = true;
+          reactionsByComment[r.comment_id] = entry;
         });
+
+        renderComments(commentsRes.data || []);
+      }).catch(function (err) {
+        console.error(err);
+        commentListLoading.hidden = true;
+      });
     }
 
     newCommentForm.addEventListener('submit', function (ev) {

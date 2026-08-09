@@ -1342,3 +1342,71 @@ footer a:hover { text-decoration: underline; }
   color: #999;
   font-weight: 400;
 }
+
+/* Statut des commentaires + réactions */
+
+.status-badge {
+  margin-left: auto;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.status-nouveau {
+  background: var(--papier-fonce);
+  color: #888;
+}
+
+.status-en_cours {
+  background: #fdeecb;
+  color: #b3720a;
+}
+
+.status-corrige {
+  background: #dff2e4;
+  color: #1e824c;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.reaction-btn {
+  background: white;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--encre);
+}
+
+.reaction-btn:hover {
+  border-color: var(--teal);
+}
+
+.reaction-btn-active {
+  background: var(--teal-soft);
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.status-select {
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--bordure);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  color: var(--encre);
+  background: white;
+}
