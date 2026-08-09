@@ -1019,6 +1019,12 @@ footer a:hover { text-decoration: underline; }
 
 .version-item ul li { margin: 0.3rem 0; }
 
+/* Garantit que l'attribut "hidden" masque toujours l'élément, même quand
+   une règle plus bas (ex. display: flex) s'applique à la même classe. */
+[hidden] {
+  display: none !important;
+}
+
 .forum-gate {
   max-width: 480px;
   margin: 0 auto;
