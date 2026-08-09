@@ -1018,3 +1018,120 @@ footer a:hover { text-decoration: underline; }
 }
 
 .version-item ul li { margin: 0.3rem 0; }
+
+.forum-gate {
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--papier-fonce);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.gate-form input {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.gate-error {
+  color: #c0392b;
+  font-size: 0.88rem;
+  margin-top: 0.9rem;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  background: white;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.comment-form input,
+.comment-form textarea {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.comment-form .btn {
+  align-self: flex-start;
+}
+
+.reply-form {
+  margin: 0.8rem 0 0;
+  padding: 0.9rem;
+  background: var(--papier-fonce);
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-card {
+  background: white;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+}
+
+.comment-card.comment-reply {
+  background: var(--papier-fonce);
+  box-shadow: none;
+}
+
+.comment-meta {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.comment-body {
+  margin: 0;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.reply-toggle {
+  margin-top: 0.6rem;
+  background: none;
+  border: none;
+  color: var(--orange);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reply-toggle:hover {
+  text-decoration: underline;
+}
+
+.comment-replies {
+  margin-top: 0.9rem;
+  padding-left: 1.2rem;
+  border-left: 2px solid var(--bordure);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}

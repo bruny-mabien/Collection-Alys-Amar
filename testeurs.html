@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace testeurs — Alys &amp; Amar AudioLivre</title>
+<meta name="description" content="Espace privé réservé aux testeurs d'Alys & Amar AudioLivre pour partager commentaires, suggestions et recommandations.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/icone-web.png">
+<link rel="apple-touch-icon" href="assets/icone-web.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="site-top">
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <img class="logo" src="assets/logo-web.png" alt="Alys & Amar AudioLivre">
+        <div>
+          <h1>Alys &amp; Amar AudioLivre</h1>
+          <p class="tagline">Espace testeurs</p>
+        </div>
+      </div>
+      <div class="app-badge">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="1.5" width="12" height="21" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="10.5" y1="19" x2="13.5" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Application mobile</span>
+      </div>
+    </div>
+  </header>
+  <nav class="site-nav">
+    <a href="index.html">Accueil</a>
+    <a href="index.html#app">Télécharger l'app</a>
+    <a href="index.html#faq">FAQ</a>
+    <a href="commander.html" class="site-nav-highlight">Achat sur Amazon</a>
+  </nav>
+</div>
+
+<main class="policy">
+
+  <!-- Écran de mot de passe -->
+  <section id="forumGate" class="forum-gate">
+    <h2 style="margin-top:0;">Espace réservé aux testeurs</h2>
+    <p>
+      Cet espace est réservé aux personnes participant au test fermé d'Alys &amp; Amar
+      AudioLivre. Le mot de passe vous a été communiqué directement.
+    </p>
+    <form id="gateForm" class="gate-form">
+      <input type="password" id="gatePassword" placeholder="Mot de passe" autocomplete="current-password" required>
+      <button type="submit" class="btn btn-primary">Accéder à l'espace</button>
+    </form>
+    <p id="gateError" class="gate-error" hidden>Mot de passe incorrect. Réessayez.</p>
+  </section>
+
+  <!-- Espace commentaires (masqué tant que le mot de passe n'est pas validé) -->
+  <section id="forumApp" hidden>
+    <h2 style="margin-top:0;">Vos commentaires, suggestions et recommandations</h2>
+    <p>
+      Partagez ici tout ce que vous remarquez pendant le test : ce qui fonctionne bien,
+      ce qui vous surprend, une idée d'amélioration. Vous pouvez aussi répondre au
+      commentaire d'un autre testeur.
+    </p>
+
+    <form id="newCommentForm" class="comment-form">
+      <input type="text" id="newAuthor" placeholder="Votre prénom" maxlength="60" required>
+      <textarea id="newBody" placeholder="Votre commentaire, suggestion ou recommandation…" maxlength="4000" rows="3" required></textarea>
+      <button type="submit" class="btn btn-primary">Publier</button>
+      <p id="newCommentError" class="gate-error" hidden>Une erreur est survenue. Réessayez.</p>
+    </form>
+
+    <div id="commentList" class="comment-list">
+      <p id="commentListEmpty" class="meta" hidden>Aucun commentaire pour l'instant — soyez le premier à en publier un.</p>
+      <p id="commentListLoading" class="meta">Chargement des commentaires…</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-grid">
+
+    <div class="footer-col footer-col-partners">
+      <p class="footer-col-title">Partenaires</p>
+      <div class="partner-item">
+        <p class="partner-label">Enregistrement audio</p>
+        <img class="partner-logo" src="assets/partenaire-gsm-studio.png" alt="GSM Studio">
+      </div>
+    </div>
+
+    <div class="footer-col footer-col-brand">
+      <img class="erpe-logo" src="assets/logo-erpe.png" alt="Erpé Éditions Jeunesse">
+      <p class="copyright">&copy; 2026 Erpé Éditions Jeunesse. Tous droits réservés.</p>
+      <p>Alys &amp; Amar AudioLivre</p>
+    </div>
+
+    <div class="footer-col footer-col-updates">
+      <p class="footer-col-title">Suivi du projet</p>
+      <a class="btn-updates" href="nouveautes.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="3 17 9 11 13 15 21 6"/>
+          <polyline points="15 6 21 6 21 12"/>
+        </svg>
+        Évolution de l'app
+      </a>
+    </div>
+
+  </div>
+</footer>
+
+<button type="button" class="back-to-top" id="backToTop" aria-label="Revenir en haut de la page">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+    <line x1="12" y1="19" x2="12" y2="5"/>
+    <polyline points="6 11 12 5 18 11"/>
+  </svg>
+</button>
+
+<script>
+  // Bouton "revenir en haut"
+  (function () {
+    var btn = document.getElementById('backToTop');
+    if (!btn) return;
+    function toggle() {
+      if (window.scrollY > 400) btn.classList.add('visible');
+      else btn.classList.remove('visible');
+    }
+    window.addEventListener('scroll', toggle, { passive: true });
+    toggle();
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  })();
+
+  // Espace testeurs : mot de passe + commentaires
+  (function () {
+    var API_URL = 'https://ccwhqqrdiozuymccjcci.supabase.co/functions/v1/forum-api';
+    var STORAGE_KEY = 'alysamar_forum_password';
+
+    var gateSection = document.getElementById('forumGate');
+    var appSection = document.getElementById('forumApp');
+    var gateForm = document.getElementById('gateForm');
+    var gatePasswordInput = document.getElementById('gatePassword');
+    var gateError = document.getElementById('gateError');
+    var newCommentForm = document.getElementById('newCommentForm');
+    var newAuthorInput = document.getElementById('newAuthor');
+    var newBodyInput = document.getElementById('newBody');
+    var newCommentError = document.getElementById('newCommentError');
+    var commentList = document.getElementById('commentList');
+    var commentListEmpty = document.getElementById('commentListEmpty');
+    var commentListLoading = document.getElementById('commentListLoading');
+
+    var currentPassword = null;
+
+    function call(action, extra) {
+      var body = Object.assign({ password: currentPassword, action: action }, extra || {});
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }).then(function (res) {
+        return res.json().then(function (data) {
+          if (!res.ok) {
+            var err = new Error(data.error || 'request_failed');
+            err.status = res.status;
+            throw err;
+          }
+          return data;
+        });
+      });
+    }
+
+    function unlock(password) {
+      currentPassword = password;
+      return call('list').then(function (data) {
+        try { localStorage.setItem(STORAGE_KEY, password); } catch (e) {}
+        gateSection.hidden = true;
+        appSection.hidden = false;
+        renderComments(data.comments || []);
+        return true;
+      });
+    }
+
+    function buildTree(comments) {
+      var byId = {};
+      var roots = [];
+      comments.forEach(function (c) { c._children = []; byId[c.id] = c; });
+      comments.forEach(function (c) {
+        if (c.parent_id && byId[c.parent_id]) {
+          byId[c.parent_id]._children.push(c);
+        } else {
+          roots.push(c);
+        }
+      });
+      return roots;
+    }
+
+    function formatDate(iso) {
+      try {
+        var d = new Date(iso);
+        return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' à ' +
+               d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function renderComment(c, depth) {
+      var card = document.createElement('div');
+      card.className = 'comment-card';
+      if (depth > 0) card.classList.add('comment-reply');
+
+      var meta = document.createElement('p');
+      meta.className = 'comment-meta';
+      meta.textContent = c.author_name + ' — ' + formatDate(c.created_at);
+      card.appendChild(meta);
+
+      var body = document.createElement('p');
+      body.className = 'comment-body';
+      body.textContent = c.body;
+      card.appendChild(body);
+
+      var replyToggle = document.createElement('button');
+      replyToggle.type = 'button';
+      replyToggle.className = 'reply-toggle';
+      replyToggle.textContent = 'Répondre';
+      card.appendChild(replyToggle);
+
+      var replyForm = document.createElement('form');
+      replyForm.className = 'comment-form reply-form';
+      replyForm.hidden = true;
+      replyForm.innerHTML =
+        '<input type="text" placeholder="Votre prénom" maxlength="60" required>' +
+        '<textarea placeholder="Votre réponse…" maxlength="4000" rows="2" required></textarea>' +
+        '<button type="submit" class="btn btn-secondary">Répondre</button>';
+      card.appendChild(replyForm);
+
+      replyToggle.addEventListener('click', function () {
+        replyForm.hidden = !replyForm.hidden;
+      });
+
+      replyForm.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var author = replyForm.querySelector('input').value.trim();
+        var text = replyForm.querySelector('textarea').value.trim();
+        if (!author || !text) return;
+        var btn = replyForm.querySelector('button');
+        btn.disabled = true;
+        call('post', { author_name: author, body: text, parent_id: c.id })
+          .then(function () { return refresh(); })
+          .catch(function () { btn.disabled = false; })
+          .then(function () { btn.disabled = false; });
+      });
+
+      if (c._children && c._children.length) {
+        var repliesWrap = document.createElement('div');
+        repliesWrap.className = 'comment-replies';
+        c._children.forEach(function (child) {
+          repliesWrap.appendChild(renderComment(child, depth + 1));
+        });
+        card.appendChild(repliesWrap);
+      }
+
+      return card;
+    }
+
+    function renderComments(comments) {
+      commentListLoading.hidden = true;
+      commentList.querySelectorAll('.comment-card').forEach(function (n) { n.remove(); });
+      if (!comments.length) {
+        commentListEmpty.hidden = false;
+        return;
+      }
+      commentListEmpty.hidden = true;
+      var tree = buildTree(comments);
+      // Les plus récents en premier au niveau racine.
+      tree.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      tree.forEach(function (root) {
+        commentList.appendChild(renderComment(root, 0));
+      });
+    }
+
+    function refresh() {
+      return call('list').then(function (data) {
+        renderComments(data.comments || []);
+      });
+    }
+
+    gateForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      gateError.hidden = true;
+      var pwd = gatePasswordInput.value;
+      unlock(pwd).catch(function (err) {
+        gateError.hidden = false;
+      });
+    });
+
+    newCommentForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      newCommentError.hidden = true;
+      var author = newAuthorInput.value.trim();
+      var text = newBodyInput.value.trim();
+      if (!author || !text) return;
+      var btn = newCommentForm.querySelector('button');
+      btn.disabled = true;
+      call('post', { author_name: author, body: text })
+        .then(function () {
+          newBodyInput.value = '';
+          return refresh();
+        })
+        .catch(function () { newCommentError.hidden = false; })
+        .then(function () { btn.disabled = false; });
+    });
+
+    // Tentative de connexion silencieuse si un mot de passe est déjà mémorisé.
+    var saved = null;
+    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    if (saved) {
+      unlock(saved).catch(function () {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
