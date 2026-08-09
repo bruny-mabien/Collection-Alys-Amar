@@ -257,7 +257,13 @@
     var reactionsByComment = {};
 
     // --- Mise en forme du texte : balisage simple, jamais de HTML brut ---
-    var FORMAT_REGEX = /\*\*([^*]+)\*\*|_([^_]+)_|\+\+([^+]+)\+\+|\[c:(#[0-9a-fA-F]{6})\]([^\[]+)\[\/c\]/g;
+    // Chaque niveau de balise est ré-analysé récursivement, pour que des
+    // styles combinés (ex. souligné autour d'un texte déjà coloré) soient
+    // bien tous les deux appliqués au lieu d'afficher les balises internes
+    // telles quelles. On utilise une nouvelle instance de RegExp à chaque
+    // appel (plutôt qu'un objet global partagé) pour que les appels
+    // récursifs ne perturbent pas la position de lecture de l'appel parent.
+    var FORMAT_REGEX_SOURCE = '\\*\\*([^*]+)\\*\\*|_([^_]+)_|\\+\\+([^+]+)\\+\\+|\\[c:(#[0-9a-fA-F]{6})\\]([^\\[]+)\\[\\/c\\]';
 
     function toolbarHTML() {
       return '<div class="editor-toolbar">' +
@@ -302,39 +308,43 @@
       });
     }
 
-    function renderFormattedBody(container, text) {
-      container.textContent = '';
+    function appendParsedNodes(container, text) {
+      var re = new RegExp(FORMAT_REGEX_SOURCE, 'g');
       var lastIndex = 0;
       var match;
-      FORMAT_REGEX.lastIndex = 0;
-      while ((match = FORMAT_REGEX.exec(text)) !== null) {
+      while ((match = re.exec(text)) !== null) {
         if (match.index > lastIndex) {
           container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
         }
         if (match[1] !== undefined) {
           var strong = document.createElement('strong');
-          strong.textContent = match[1];
+          appendParsedNodes(strong, match[1]);
           container.appendChild(strong);
         } else if (match[2] !== undefined) {
           var em = document.createElement('em');
-          em.textContent = match[2];
+          appendParsedNodes(em, match[2]);
           container.appendChild(em);
         } else if (match[3] !== undefined) {
           var u = document.createElement('span');
           u.style.textDecoration = 'underline';
-          u.textContent = match[3];
+          appendParsedNodes(u, match[3]);
           container.appendChild(u);
         } else if (match[4] !== undefined) {
           var span = document.createElement('span');
           span.style.color = match[4];
-          span.textContent = match[5];
+          appendParsedNodes(span, match[5]);
           container.appendChild(span);
         }
-        lastIndex = FORMAT_REGEX.lastIndex;
+        lastIndex = re.lastIndex;
       }
       if (lastIndex < text.length) {
         container.appendChild(document.createTextNode(text.slice(lastIndex)));
       }
+    }
+
+    function renderFormattedBody(container, text) {
+      container.textContent = '';
+      appendParsedNodes(container, text);
     }
 
     // --- Avatar ---
