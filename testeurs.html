@@ -95,7 +95,9 @@
       </div>
     </div>
 
-    <div id="profilePanel" class="profile-panel" hidden>
+    <div id="profileView" class="profile-panel" hidden>
+      <button type="button" id="backToForumBtn" class="reply-toggle" style="margin-bottom:0.6rem;">&larr; Retour au forum</button>
+      <h2 style="margin-top:0;">Mon profil</h2>
       <form id="profileForm">
         <p class="field-label">Nom affiché</p>
         <input type="text" id="profileDisplayName" maxlength="60" required>
@@ -114,33 +116,35 @@
       <p id="profileSuccess" class="meta" hidden style="color:#1e824c;">Enregistré.</p>
     </div>
 
-    <h2 style="margin-top:0;">Vos commentaires, suggestions et recommandations</h2>
-    <p>
-      Partagez ici tout ce que vous remarquez pendant le test : ce qui fonctionne bien,
-      ce qui vous surprend, une idée d'amélioration. Vous pouvez aussi répondre au
-      commentaire d'un autre testeur.
-    </p>
+    <div id="forumView">
+      <h2 style="margin-top:0;">Vos commentaires, suggestions et recommandations</h2>
+      <p>
+        Partagez ici tout ce que vous remarquez pendant le test : ce qui fonctionne bien,
+        ce qui vous surprend, une idée d'amélioration. Vous pouvez aussi répondre au
+        commentaire d'un autre testeur.
+      </p>
 
-    <form id="newCommentForm" class="comment-form">
-      <div class="editor-toolbar">
-        <button type="button" class="editor-btn" data-wrap="bold" title="Gras"><b>G</b></button>
-        <button type="button" class="editor-btn" data-wrap="italic" title="Italique"><i>I</i></button>
-        <button type="button" class="editor-btn" data-wrap="underline" title="Souligné"><u>S</u></button>
-        <span class="editor-sep"></span>
-        <button type="button" class="editor-color-btn" data-color="#0b5b64" title="Texte teal" style="background:#0b5b64"></button>
-        <button type="button" class="editor-color-btn" data-color="#f5821f" title="Texte orange" style="background:#f5821f"></button>
-        <button type="button" class="editor-color-btn" data-color="#c0392b" title="Texte rouge" style="background:#c0392b"></button>
-        <button type="button" class="editor-color-btn" data-color="#1e824c" title="Texte vert" style="background:#1e824c"></button>
+      <form id="newCommentForm" class="comment-form">
+        <div class="editor-toolbar">
+          <button type="button" class="editor-btn" data-wrap="bold" title="Gras"><b>G</b></button>
+          <button type="button" class="editor-btn" data-wrap="italic" title="Italique"><i>I</i></button>
+          <button type="button" class="editor-btn" data-wrap="underline" title="Souligné"><u>S</u></button>
+          <span class="editor-sep"></span>
+          <button type="button" class="editor-color-btn" data-color="#0b5b64" title="Texte teal" style="background:#0b5b64"></button>
+          <button type="button" class="editor-color-btn" data-color="#f5821f" title="Texte orange" style="background:#f5821f"></button>
+          <button type="button" class="editor-color-btn" data-color="#c0392b" title="Texte rouge" style="background:#c0392b"></button>
+          <button type="button" class="editor-color-btn" data-color="#1e824c" title="Texte vert" style="background:#1e824c"></button>
+        </div>
+        <p class="editor-hint">Sélectionnez du texte, puis cliquez sur un bouton pour le mettre en forme.</p>
+        <textarea id="newBody" placeholder="Votre commentaire, suggestion ou recommandation…" maxlength="4000" rows="3" required></textarea>
+        <button type="submit" class="btn btn-primary">Publier</button>
+        <p id="newCommentError" class="gate-error" hidden>Une erreur est survenue. Réessayez.</p>
+      </form>
+
+      <div id="commentList" class="comment-list">
+        <p id="commentListEmpty" class="meta" hidden>Aucun commentaire pour l'instant — soyez le premier à en publier un.</p>
+        <p id="commentListLoading" class="meta">Chargement des commentaires…</p>
       </div>
-      <p class="editor-hint">Sélectionnez du texte, puis cliquez sur un bouton pour le mettre en forme.</p>
-      <textarea id="newBody" placeholder="Votre commentaire, suggestion ou recommandation…" maxlength="4000" rows="3" required></textarea>
-      <button type="submit" class="btn btn-primary">Publier</button>
-      <p id="newCommentError" class="gate-error" hidden>Une erreur est survenue. Réessayez.</p>
-    </form>
-
-    <div id="commentList" class="comment-list">
-      <p id="commentListEmpty" class="meta" hidden>Aucun commentaire pour l'instant — soyez le premier à en publier un.</p>
-      <p id="commentListLoading" class="meta">Chargement des commentaires…</p>
     </div>
   </section>
 
@@ -228,7 +232,9 @@
     var toggleProfilePanel = document.getElementById('toggleProfilePanel');
     var logoutBtn = document.getElementById('logoutBtn');
 
-    var profilePanel = document.getElementById('profilePanel');
+    var profileView = document.getElementById('profileView');
+    var forumView = document.getElementById('forumView');
+    var backToForumBtn = document.getElementById('backToForumBtn');
     var profileForm = document.getElementById('profileForm');
     var profileDisplayName = document.getElementById('profileDisplayName');
     var avatarColorRow = document.getElementById('avatarColorRow');
@@ -374,6 +380,9 @@
       selectedAvatarColor = currentProfile.avatar_color || AVATAR_COLORS[0];
       buildAvatarColorRow();
 
+      profileView.hidden = true;
+      forumView.hidden = false;
+
       loadComments();
     }
 
@@ -450,9 +459,15 @@
       });
     });
 
-    // --- Panneau profil (facultatif) ---
+    // --- Page profil (facultative) ---
     toggleProfilePanel.addEventListener('click', function () {
-      profilePanel.hidden = !profilePanel.hidden;
+      forumView.hidden = true;
+      profileView.hidden = false;
+    });
+
+    backToForumBtn.addEventListener('click', function () {
+      profileView.hidden = true;
+      forumView.hidden = false;
     });
 
     profileForm.addEventListener('submit', function (ev) {
