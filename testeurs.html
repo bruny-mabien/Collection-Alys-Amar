@@ -9,6 +9,7 @@
 <link rel="icon" href="assets/icone-web.png">
 <link rel="apple-touch-icon" href="assets/icone-web.png">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -36,27 +37,83 @@
     <a href="index.html#app">Télécharger l'app</a>
     <a href="index.html#faq">FAQ</a>
     <a href="commander.html" class="site-nav-highlight">Achat sur Amazon</a>
+    <a href="testeurs.html">Testeurs</a>
   </nav>
 </div>
 
 <main class="policy">
 
-  <!-- Écran de mot de passe -->
-  <section id="forumGate" class="forum-gate">
+  <!-- Écran de connexion -->
+  <section id="authGate" class="forum-gate">
     <h2 style="margin-top:0;">Espace réservé aux testeurs</h2>
     <p>
-      Cet espace est réservé aux personnes participant au test fermé d'Alys &amp; Amar
-      AudioLivre. Le mot de passe vous a été communiqué directement.
+      Connectez-vous avec l'adresse e-mail qui vous a été communiquée. Un mot de
+      passe par défaut vous a été fourni — vous devrez le changer lors de votre
+      première connexion.
     </p>
-    <form id="gateForm" class="gate-form">
-      <input type="password" id="gatePassword" placeholder="Mot de passe" autocomplete="current-password" required>
-      <button type="submit" class="btn btn-primary">Accéder à l'espace</button>
+    <form id="loginForm" class="gate-form">
+      <input type="email" id="loginEmail" placeholder="Votre e-mail" autocomplete="username" required>
+      <input type="password" id="loginPassword" placeholder="Mot de passe" autocomplete="current-password" required>
+      <button type="submit" class="btn btn-primary">Se connecter</button>
     </form>
-    <p id="gateError" class="gate-error" hidden>Mot de passe incorrect. Réessayez.</p>
+    <p id="loginError" class="gate-error" hidden>E-mail ou mot de passe incorrect.</p>
+    <p class="meta" style="margin-top:1rem;">
+      Problème de connexion ? Écrivez à
+      <a href="mailto:bruny.mabien@gmail.com">bruny.mabien@gmail.com</a>.
+    </p>
   </section>
 
-  <!-- Espace commentaires (masqué tant que le mot de passe n'est pas validé) -->
+  <!-- Changement de mot de passe obligatoire (première connexion) -->
+  <section id="passwordChangeGate" class="forum-gate" hidden>
+    <h2 style="margin-top:0;">Choisissez votre mot de passe</h2>
+    <p>
+      Pour votre sécurité, vous devez remplacer le mot de passe par défaut avant
+      de continuer.
+    </p>
+    <form id="passwordChangeForm" class="gate-form">
+      <input type="password" id="newPassword1" placeholder="Nouveau mot de passe (8 caractères minimum)" autocomplete="new-password" minlength="8" required>
+      <input type="password" id="newPassword2" placeholder="Confirmer le nouveau mot de passe" autocomplete="new-password" minlength="8" required>
+      <button type="submit" class="btn btn-primary">Valider le nouveau mot de passe</button>
+    </form>
+    <p id="passwordChangeError" class="gate-error" hidden>Une erreur est survenue. Réessayez.</p>
+  </section>
+
+  <!-- Espace testeur (masqué tant que la connexion n'est pas complète) -->
   <section id="forumApp" hidden>
+
+    <div class="profile-bar">
+      <div class="profile-identity">
+        <div id="profileAvatar" class="avatar-circle">?</div>
+        <div>
+          <p id="profileName" class="profile-name">—</p>
+          <p id="profileEmail" class="profile-sub">—</p>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button type="button" id="toggleProfilePanel" class="btn-small">Mon profil</button>
+        <button type="button" id="logoutBtn" class="btn-small">Se déconnecter</button>
+      </div>
+    </div>
+
+    <div id="profilePanel" class="profile-panel" hidden>
+      <form id="profileForm">
+        <p class="field-label">Nom affiché</p>
+        <input type="text" id="profileDisplayName" maxlength="60" required>
+        <p class="field-label" style="margin-top:0.8rem;">Couleur de l'avatar</p>
+        <div id="avatarColorRow" class="avatar-color-row"></div>
+        <button type="submit" class="btn btn-secondary" style="margin-top:0.9rem;">Enregistrer le profil</button>
+      </form>
+      <hr style="border:none;border-top:1px solid var(--bordure);margin:0.4rem 0;">
+      <form id="changePasswordForm">
+        <p class="field-label">Changer de mot de passe</p>
+        <input type="password" id="profileNewPassword1" placeholder="Nouveau mot de passe" autocomplete="new-password" minlength="8" required>
+        <input type="password" id="profileNewPassword2" placeholder="Confirmer le nouveau mot de passe" autocomplete="new-password" minlength="8" required style="margin-top:0.6rem;">
+        <button type="submit" class="btn btn-secondary" style="margin-top:0.9rem;">Mettre à jour le mot de passe</button>
+      </form>
+      <p id="profileError" class="gate-error" hidden></p>
+      <p id="profileSuccess" class="meta" hidden style="color:#1e824c;">Enregistré.</p>
+    </div>
+
     <h2 style="margin-top:0;">Vos commentaires, suggestions et recommandations</h2>
     <p>
       Partagez ici tout ce que vous remarquez pendant le test : ce qui fonctionne bien,
@@ -65,7 +122,6 @@
     </p>
 
     <form id="newCommentForm" class="comment-form">
-      <input type="text" id="newAuthor" placeholder="Votre prénom" maxlength="60" required>
       <div class="editor-toolbar">
         <button type="button" class="editor-btn" data-wrap="bold" title="Gras"><b>G</b></button>
         <button type="button" class="editor-btn" data-wrap="italic" title="Italique"><i>I</i></button>
@@ -144,31 +200,56 @@
     });
   })();
 
-  // Espace testeurs : mot de passe + commentaires
+  // Espace testeurs : comptes réels (Supabase Auth) + forum
   (function () {
-    var API_URL = 'https://ccwhqqrdiozuymccjcci.supabase.co/functions/v1/forum-api';
-    var STORAGE_KEY = 'alysamar_forum_password';
+    var SUPABASE_URL = 'https://ccwhqqrdiozuymccjcci.supabase.co';
+    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjd2hxcXJkaW96dXltY2NqY2NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTg5OTAsImV4cCI6MjEwMTgzNDk5MH0.IqEjBgtEjvsLk7EZd9xMWykOIXrA8VVjMJi5vLq7o7I';
+    var AVATAR_COLORS = ['#0b5b64', '#f5821f', '#c0392b', '#1e824c', '#6c3fa6', '#2266cc'];
 
-    var gateSection = document.getElementById('forumGate');
-    var appSection = document.getElementById('forumApp');
-    var gateForm = document.getElementById('gateForm');
-    var gatePasswordInput = document.getElementById('gatePassword');
-    var gateError = document.getElementById('gateError');
+    var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    var authGate = document.getElementById('authGate');
+    var passwordChangeGate = document.getElementById('passwordChangeGate');
+    var forumApp = document.getElementById('forumApp');
+
+    var loginForm = document.getElementById('loginForm');
+    var loginEmail = document.getElementById('loginEmail');
+    var loginPassword = document.getElementById('loginPassword');
+    var loginError = document.getElementById('loginError');
+
+    var passwordChangeForm = document.getElementById('passwordChangeForm');
+    var newPassword1 = document.getElementById('newPassword1');
+    var newPassword2 = document.getElementById('newPassword2');
+    var passwordChangeError = document.getElementById('passwordChangeError');
+
+    var profileAvatar = document.getElementById('profileAvatar');
+    var profileName = document.getElementById('profileName');
+    var profileEmail = document.getElementById('profileEmail');
+    var toggleProfilePanel = document.getElementById('toggleProfilePanel');
+    var logoutBtn = document.getElementById('logoutBtn');
+
+    var profilePanel = document.getElementById('profilePanel');
+    var profileForm = document.getElementById('profileForm');
+    var profileDisplayName = document.getElementById('profileDisplayName');
+    var avatarColorRow = document.getElementById('avatarColorRow');
+    var changePasswordForm = document.getElementById('changePasswordForm');
+    var profileNewPassword1 = document.getElementById('profileNewPassword1');
+    var profileNewPassword2 = document.getElementById('profileNewPassword2');
+    var profileError = document.getElementById('profileError');
+    var profileSuccess = document.getElementById('profileSuccess');
+
     var newCommentForm = document.getElementById('newCommentForm');
-    var newAuthorInput = document.getElementById('newAuthor');
     var newBodyInput = document.getElementById('newBody');
     var newCommentError = document.getElementById('newCommentError');
     var commentList = document.getElementById('commentList');
     var commentListEmpty = document.getElementById('commentListEmpty');
     var commentListLoading = document.getElementById('commentListLoading');
 
-    var currentPassword = null;
+    var currentUser = null;
+    var currentProfile = null;
+    var selectedAvatarColor = AVATAR_COLORS[0];
 
     // --- Mise en forme du texte : balisage simple, jamais de HTML brut ---
-    // Le texte est stocké tel quel (**gras**, _italique_, ++souligné++,
-    // [c:#hex]couleur[/c]) et interprété uniquement à l'affichage, en
-    // construisant des noeuds DOM directement (aucune insertion HTML,
-    // donc aucun risque d'injection quel que soit le contenu tapé).
     var FORMAT_REGEX = /\*\*([^*]+)\*\*|_([^_]+)_|\+\+([^+]+)\+\+|\[c:(#[0-9a-fA-F]{6})\]([^\[]+)\[\/c\]/g;
 
     function toolbarHTML() {
@@ -249,35 +330,193 @@
       }
     }
 
-    function call(action, extra) {
-      var body = Object.assign({ password: currentPassword, action: action }, extra || {});
-      return fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      }).then(function (res) {
-        return res.json().then(function (data) {
-          if (!res.ok) {
-            var err = new Error(data.error || 'request_failed');
-            err.status = res.status;
-            throw err;
-          }
-          return data;
+    // --- Avatar ---
+    function initialOf(name) {
+      return (name || '?').trim().charAt(0).toUpperCase() || '?';
+    }
+
+    function makeAvatarNode(name, color, small) {
+      var el = document.createElement('div');
+      el.className = 'avatar-circle' + (small ? ' avatar-circle-sm' : '');
+      el.style.background = color || '#0b5b64';
+      el.textContent = initialOf(name);
+      return el;
+    }
+
+    function buildAvatarColorRow() {
+      avatarColorRow.innerHTML = '';
+      AVATAR_COLORS.forEach(function (color) {
+        var swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'avatar-color-swatch';
+        swatch.style.background = color;
+        if (color === selectedAvatarColor) swatch.classList.add('selected');
+        swatch.addEventListener('click', function () {
+          selectedAvatarColor = color;
+          avatarColorRow.querySelectorAll('.avatar-color-swatch').forEach(function (s) { s.classList.remove('selected'); });
+          swatch.classList.add('selected');
         });
+        avatarColorRow.appendChild(swatch);
       });
     }
 
-    function unlock(password) {
-      currentPassword = password;
-      return call('list').then(function (data) {
-        try { localStorage.setItem(STORAGE_KEY, password); } catch (e) {}
-        gateSection.hidden = true;
-        appSection.hidden = false;
-        renderComments(data.comments || []);
-        return true;
+    // --- Profil ---
+    function showForumUI() {
+      authGate.hidden = true;
+      passwordChangeGate.hidden = true;
+      forumApp.hidden = false;
+
+      profileAvatar.style.background = currentProfile.avatar_color || '#0b5b64';
+      profileAvatar.textContent = initialOf(currentProfile.display_name);
+      profileName.textContent = currentProfile.display_name || 'Testeur';
+      profileEmail.textContent = currentUser.email || '';
+      profileDisplayName.value = currentProfile.display_name || '';
+      selectedAvatarColor = currentProfile.avatar_color || AVATAR_COLORS[0];
+      buildAvatarColorRow();
+
+      loadComments();
+    }
+
+    function loadProfile() {
+      return sb.from('profiles').select('*').eq('id', currentUser.id).single().then(function (res) {
+        if (res.error) throw res.error;
+        currentProfile = res.data;
+        if (currentProfile.must_change_password) {
+          authGate.hidden = true;
+          forumApp.hidden = true;
+          passwordChangeGate.hidden = false;
+        } else {
+          showForumUI();
+        }
       });
     }
 
+    function resetToLogin() {
+      currentUser = null;
+      currentProfile = null;
+      authGate.hidden = false;
+      passwordChangeGate.hidden = true;
+      forumApp.hidden = true;
+      loginEmail.value = '';
+      loginPassword.value = '';
+    }
+
+    // --- Connexion ---
+    loginForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      loginError.hidden = true;
+      var email = loginEmail.value.trim();
+      var password = loginPassword.value;
+      var btn = loginForm.querySelector('button');
+      btn.disabled = true;
+      sb.auth.signInWithPassword({ email: email, password: password }).then(function (res) {
+        if (res.error) throw res.error;
+        currentUser = res.data.user;
+        return loadProfile();
+      }).catch(function (err) {
+        console.error(err);
+        loginError.hidden = false;
+      }).then(function () {
+        btn.disabled = false;
+      });
+    });
+
+    // --- Changement de mot de passe obligatoire ---
+    passwordChangeForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      passwordChangeError.hidden = true;
+      if (newPassword1.value !== newPassword2.value) {
+        passwordChangeError.textContent = 'Les deux mots de passe ne correspondent pas.';
+        passwordChangeError.hidden = false;
+        return;
+      }
+      var btn = passwordChangeForm.querySelector('button');
+      btn.disabled = true;
+      sb.auth.updateUser({ password: newPassword1.value }).then(function (res) {
+        if (res.error) throw res.error;
+        return sb.from('profiles').update({ must_change_password: false, updated_at: new Date().toISOString() }).eq('id', currentUser.id);
+      }).then(function (res) {
+        if (res.error) throw res.error;
+        currentProfile.must_change_password = false;
+        newPassword1.value = '';
+        newPassword2.value = '';
+        showForumUI();
+      }).catch(function (err) {
+        console.error(err);
+        passwordChangeError.textContent = 'Une erreur est survenue. Réessayez.';
+        passwordChangeError.hidden = false;
+      }).then(function () {
+        btn.disabled = false;
+      });
+    });
+
+    // --- Panneau profil (facultatif) ---
+    toggleProfilePanel.addEventListener('click', function () {
+      profilePanel.hidden = !profilePanel.hidden;
+    });
+
+    profileForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      profileError.hidden = true;
+      profileSuccess.hidden = true;
+      var name = profileDisplayName.value.trim();
+      if (!name) return;
+      var btn = profileForm.querySelector('button');
+      btn.disabled = true;
+      sb.from('profiles').update({
+        display_name: name,
+        avatar_color: selectedAvatarColor,
+        updated_at: new Date().toISOString()
+      }).eq('id', currentUser.id).then(function (res) {
+        if (res.error) throw res.error;
+        currentProfile.display_name = name;
+        currentProfile.avatar_color = selectedAvatarColor;
+        profileAvatar.style.background = selectedAvatarColor;
+        profileAvatar.textContent = initialOf(name);
+        profileName.textContent = name;
+        profileSuccess.hidden = false;
+        return loadComments();
+      }).catch(function (err) {
+        console.error(err);
+        profileError.textContent = 'Impossible d\'enregistrer le profil.';
+        profileError.hidden = false;
+      }).then(function () {
+        btn.disabled = false;
+      });
+    });
+
+    changePasswordForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      profileError.hidden = true;
+      profileSuccess.hidden = true;
+      if (profileNewPassword1.value !== profileNewPassword2.value) {
+        profileError.textContent = 'Les deux mots de passe ne correspondent pas.';
+        profileError.hidden = false;
+        return;
+      }
+      var btn = changePasswordForm.querySelector('button');
+      btn.disabled = true;
+      sb.auth.updateUser({ password: profileNewPassword1.value }).then(function (res) {
+        if (res.error) throw res.error;
+        profileNewPassword1.value = '';
+        profileNewPassword2.value = '';
+        profileSuccess.hidden = false;
+      }).catch(function (err) {
+        console.error(err);
+        profileError.textContent = 'Impossible de mettre à jour le mot de passe.';
+        profileError.hidden = false;
+      }).then(function () {
+        btn.disabled = false;
+      });
+    });
+
+    logoutBtn.addEventListener('click', function () {
+      sb.auth.signOut().then(function () {
+        resetToLogin();
+      });
+    });
+
+    // --- Commentaires ---
     function buildTree(comments) {
       var byId = {};
       var roots = [];
@@ -302,15 +541,34 @@
       }
     }
 
+    function authorOf(c) {
+      return (c.profiles && c.profiles.display_name) || 'Testeur';
+    }
+
+    function colorOf(c) {
+      return (c.profiles && c.profiles.avatar_color) || '#0b5b64';
+    }
+
     function renderComment(c, depth) {
       var card = document.createElement('div');
       card.className = 'comment-card';
       if (depth > 0) card.classList.add('comment-reply');
 
-      var meta = document.createElement('p');
-      meta.className = 'comment-meta';
-      meta.textContent = c.author_name + ' — ' + formatDate(c.created_at);
-      card.appendChild(meta);
+      var authorRow = document.createElement('div');
+      authorRow.className = 'comment-author-row';
+      authorRow.appendChild(makeAvatarNode(authorOf(c), colorOf(c), true));
+      var metaText = document.createElement('p');
+      metaText.className = 'comment-meta-text';
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'comment-author-name';
+      nameSpan.textContent = authorOf(c);
+      var dateSpan = document.createElement('span');
+      dateSpan.className = 'comment-date';
+      dateSpan.textContent = ' — ' + formatDate(c.created_at);
+      metaText.appendChild(nameSpan);
+      metaText.appendChild(dateSpan);
+      authorRow.appendChild(metaText);
+      card.appendChild(authorRow);
 
       var body = document.createElement('p');
       body.className = 'comment-body';
@@ -327,7 +585,6 @@
       replyForm.className = 'comment-form reply-form';
       replyForm.hidden = true;
       replyForm.innerHTML =
-        '<input type="text" placeholder="Votre prénom" maxlength="60" required>' +
         toolbarHTML() +
         '<textarea placeholder="Votre réponse…" maxlength="4000" rows="2" required></textarea>' +
         '<button type="submit" class="btn btn-secondary">Répondre</button>';
@@ -340,15 +597,18 @@
 
       replyForm.addEventListener('submit', function (ev) {
         ev.preventDefault();
-        var author = replyForm.querySelector('input').value.trim();
         var text = replyForm.querySelector('textarea').value.trim();
-        if (!author || !text) return;
+        if (!text) return;
         var btn = replyForm.querySelector('button');
         btn.disabled = true;
-        call('post', { author_name: author, body: text, parent_id: c.id })
-          .then(function () { return refresh(); })
-          .catch(function () { btn.disabled = false; })
-          .then(function () { btn.disabled = false; });
+        sb.from('forum_comments').insert({ body: text, author_id: currentUser.id, parent_id: c.id }).then(function (res) {
+          if (res.error) throw res.error;
+          return loadComments();
+        }).catch(function (err) {
+          console.error(err);
+        }).then(function () {
+          btn.disabled = false;
+        });
       });
 
       if (c._children && c._children.length) {
@@ -372,55 +632,65 @@
       }
       commentListEmpty.hidden = true;
       var tree = buildTree(comments);
-      // Les plus récents en premier au niveau racine.
       tree.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
       tree.forEach(function (root) {
         commentList.appendChild(renderComment(root, 0));
       });
     }
 
-    function refresh() {
-      return call('list').then(function (data) {
-        renderComments(data.comments || []);
-      });
+    function loadComments() {
+      commentListLoading.hidden = false;
+      return sb.from('forum_comments')
+        .select('id, body, parent_id, created_at, author_id, profiles(display_name, avatar_color)')
+        .order('created_at', { ascending: true })
+        .then(function (res) {
+          if (res.error) throw res.error;
+          renderComments(res.data || []);
+        }).catch(function (err) {
+          console.error(err);
+          commentListLoading.hidden = true;
+        });
     }
-
-    gateForm.addEventListener('submit', function (ev) {
-      ev.preventDefault();
-      gateError.hidden = true;
-      var pwd = gatePasswordInput.value;
-      unlock(pwd).catch(function (err) {
-        gateError.hidden = false;
-      });
-    });
 
     newCommentForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
       newCommentError.hidden = true;
-      var author = newAuthorInput.value.trim();
       var text = newBodyInput.value.trim();
-      if (!author || !text) return;
+      if (!text) return;
       var btn = newCommentForm.querySelector('button');
       btn.disabled = true;
-      call('post', { author_name: author, body: text })
-        .then(function () {
-          newBodyInput.value = '';
-          return refresh();
-        })
-        .catch(function () { newCommentError.hidden = false; })
-        .then(function () { btn.disabled = false; });
+      sb.from('forum_comments').insert({ body: text, author_id: currentUser.id }).then(function (res) {
+        if (res.error) throw res.error;
+        newBodyInput.value = '';
+        return loadComments();
+      }).catch(function (err) {
+        console.error(err);
+        newCommentError.hidden = false;
+      }).then(function () {
+        btn.disabled = false;
+      });
     });
 
     initToolbar(newCommentForm);
 
-    // Tentative de connexion silencieuse si un mot de passe est déjà mémorisé.
-    var saved = null;
-    try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
-    if (saved) {
-      unlock(saved).catch(function () {
-        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      });
-    }
+    // Session déjà active (retour sur la page) ?
+    sb.auth.getSession().then(function (res) {
+      var session = res.data && res.data.session;
+      if (session) {
+        currentUser = session.user;
+        loadProfile().catch(function (err) {
+          console.error(err);
+          resetToLogin();
+        });
+      }
+    });
+
+    // Se remettre à l'écran de connexion si la session expire ailleurs.
+    sb.auth.onAuthStateChange(function (event) {
+      if (event === 'SIGNED_OUT') {
+        resetToLogin();
+      }
+    });
   })();
 </script>
 

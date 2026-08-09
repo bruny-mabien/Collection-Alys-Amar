@@ -1191,3 +1191,148 @@ footer a:hover { text-decoration: underline; }
   flex-direction: column;
   gap: 0.9rem;
 }
+
+/* Profil testeur / avatar */
+
+.profile-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  background: white;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.6rem;
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.avatar-circle-sm {
+  width: 26px;
+  height: 26px;
+  font-size: 0.72rem;
+}
+
+.profile-name {
+  font-weight: 700;
+  color: var(--encre);
+  margin: 0;
+}
+
+.profile-sub {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #888;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btn-small {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  border-radius: 20px;
+  border: 1px solid var(--bordure);
+  background: var(--papier-fonce);
+  color: var(--encre);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-small:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.profile-panel {
+  background: white;
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.profile-panel input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--bordure);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.avatar-color-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.avatar-color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px var(--bordure);
+  cursor: pointer;
+  padding: 0;
+}
+
+.avatar-color-swatch.selected {
+  box-shadow: 0 0 0 2px var(--teal);
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 0 0 0.3rem;
+  text-align: left;
+}
+
+.comment-author-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.comment-meta-text {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.comment-meta-text .comment-author-name {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.comment-meta-text .comment-date {
+  color: #999;
+  font-weight: 400;
+}
