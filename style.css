@@ -1198,6 +1198,22 @@ footer a:hover { text-decoration: underline; }
   gap: 0.9rem;
 }
 
+.replies-toggle {
+  margin-top: 0.8rem;
+  background: var(--teal-soft);
+  border: none;
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.replies-toggle:hover {
+  background: #d9ece9;
+}
+
 /* Profil testeur / avatar */
 
 .profile-bar {

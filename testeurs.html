@@ -210,6 +210,10 @@
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjd2hxcXJkaW96dXltY2NqY2NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTg5OTAsImV4cCI6MjEwMTgzNDk5MH0.IqEjBgtEjvsLk7EZd9xMWykOIXrA8VVjMJi5vLq7o7I';
     var AVATAR_COLORS = ['#0b5b64', '#f5821f', '#c0392b', '#1e824c', '#6c3fa6', '#2266cc'];
     var EDIT_WINDOW_MS = 15 * 60 * 1000;
+    // À partir de ce niveau d'imbrication, les réponses sont repliées par
+    // défaut (utile sur petit écran où l'indentation prend vite toute la
+    // largeur). Les réponses directes (niveau 1) restent toujours visibles.
+    var COLLAPSE_DEPTH = 2;
 
     var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -768,11 +772,30 @@
       });
 
       if (c._children && c._children.length) {
+        var childDepth = depth + 1;
         var repliesWrap = document.createElement('div');
         repliesWrap.className = 'comment-replies';
         c._children.forEach(function (child) {
-          repliesWrap.appendChild(renderComment(child, depth + 1));
+          repliesWrap.appendChild(renderComment(child, childDepth));
         });
+
+        if (childDepth >= COLLAPSE_DEPTH) {
+          var count = c._children.length;
+          repliesWrap.hidden = true;
+          var repliesToggle = document.createElement('button');
+          repliesToggle.type = 'button';
+          repliesToggle.className = 'replies-toggle';
+          repliesToggle.textContent = 'Afficher ' + count + (count > 1 ? ' réponses' : ' réponse');
+          repliesToggle.addEventListener('click', function () {
+            var willShow = repliesWrap.hidden;
+            repliesWrap.hidden = !willShow;
+            repliesToggle.textContent = willShow
+              ? 'Masquer ' + (count > 1 ? 'les réponses' : 'la réponse')
+              : 'Afficher ' + count + (count > 1 ? ' réponses' : ' réponse');
+          });
+          card.appendChild(repliesToggle);
+        }
+
         card.appendChild(repliesWrap);
       }
 
