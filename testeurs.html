@@ -209,6 +209,7 @@
     var SUPABASE_URL = 'https://ccwhqqrdiozuymccjcci.supabase.co';
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjd2hxcXJkaW96dXltY2NqY2NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNTg5OTAsImV4cCI6MjEwMTgzNDk5MH0.IqEjBgtEjvsLk7EZd9xMWykOIXrA8VVjMJi5vLq7o7I';
     var AVATAR_COLORS = ['#0b5b64', '#f5821f', '#c0392b', '#1e824c', '#6c3fa6', '#2266cc'];
+    var EDIT_WINDOW_MS = 15 * 60 * 1000;
 
     var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -633,6 +634,12 @@
       return btn;
     }
 
+    function canStillEdit(c) {
+      if (!currentUser || c.author_id !== currentUser.id) return false;
+      var age = Date.now() - new Date(c.created_at).getTime();
+      return age < EDIT_WINDOW_MS;
+    }
+
     function renderComment(c, depth) {
       var card = document.createElement('div');
       card.className = 'comment-card';
@@ -648,7 +655,7 @@
       nameSpan.textContent = authorOf(c);
       var dateSpan = document.createElement('span');
       dateSpan.className = 'comment-date';
-      dateSpan.textContent = ' — ' + formatDate(c.created_at);
+      dateSpan.textContent = ' — ' + formatDate(c.created_at) + (c.edited_at ? ' (modifié)' : '');
       metaText.appendChild(nameSpan);
       metaText.appendChild(dateSpan);
       authorRow.appendChild(metaText);
@@ -659,6 +666,20 @@
       body.className = 'comment-body';
       renderFormattedBody(body, c.body);
       card.appendChild(body);
+
+      var editForm = document.createElement('form');
+      editForm.className = 'comment-form edit-form';
+      editForm.hidden = true;
+      editForm.innerHTML =
+        toolbarHTML() +
+        '<textarea maxlength="4000" rows="3" required></textarea>' +
+        '<div class="comment-actions">' +
+        '<button type="submit" class="btn btn-secondary">Enregistrer</button>' +
+        '<button type="button" class="reply-toggle edit-cancel">Annuler</button>' +
+        '</div>';
+      card.appendChild(editForm);
+      initToolbar(editForm);
+      editForm.querySelector('textarea').value = c.body;
 
       var actionRow = document.createElement('div');
       actionRow.className = 'comment-actions';
@@ -671,11 +692,50 @@
 
       actionRow.appendChild(makeReactionButton(c));
 
+      if (canStillEdit(c)) {
+        var editToggle = document.createElement('button');
+        editToggle.type = 'button';
+        editToggle.className = 'reply-toggle';
+        editToggle.textContent = 'Modifier';
+        editToggle.addEventListener('click', function () {
+          var willShowEdit = editForm.hidden;
+          editForm.hidden = !willShowEdit;
+          body.hidden = willShowEdit;
+        });
+        actionRow.appendChild(editToggle);
+
+        var remainingMin = Math.max(1, Math.ceil((EDIT_WINDOW_MS - (Date.now() - new Date(c.created_at).getTime())) / 60000));
+        var editHint = document.createElement('span');
+        editHint.className = 'edit-hint';
+        editHint.textContent = 'Modifiable encore ' + remainingMin + ' min';
+        actionRow.appendChild(editHint);
+      }
+
       if (currentProfile && currentProfile.is_admin) {
         actionRow.appendChild(makeAdminStatusControl(c));
       }
 
       card.appendChild(actionRow);
+
+      editForm.querySelector('.edit-cancel').addEventListener('click', function () {
+        editForm.hidden = true;
+        body.hidden = false;
+      });
+
+      editForm.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var newText = editForm.querySelector('textarea').value.trim();
+        if (!newText) return;
+        var saveBtn = editForm.querySelector('button[type="submit"]');
+        saveBtn.disabled = true;
+        sb.from('forum_comments').update({ body: newText, edited_at: new Date().toISOString() }).eq('id', c.id).then(function (res) {
+          if (res.error) throw res.error;
+          return loadComments();
+        }).catch(function (err) {
+          console.error(err);
+          saveBtn.disabled = false;
+        });
+      });
 
       var replyForm = document.createElement('form');
       replyForm.className = 'comment-form reply-form';
@@ -738,7 +798,7 @@
       commentListLoading.hidden = false;
       return Promise.all([
         sb.from('forum_comments')
-          .select('id, body, parent_id, created_at, author_id, status, profiles(display_name, avatar_color)')
+          .select('id, body, parent_id, created_at, edited_at, author_id, status, profiles(display_name, avatar_color)')
           .order('created_at', { ascending: true }),
         sb.from('forum_reactions').select('comment_id, user_id')
       ]).then(function (results) {

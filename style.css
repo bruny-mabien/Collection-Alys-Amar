@@ -1400,6 +1400,15 @@ footer a:hover { text-decoration: underline; }
   font-weight: 700;
 }
 
+.edit-hint {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.edit-form {
+  margin-top: 0.6rem;
+}
+
 .status-select {
   margin-left: auto;
   padding: 0.25rem 0.5rem;
