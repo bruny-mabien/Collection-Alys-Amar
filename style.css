@@ -707,6 +707,17 @@ h2 {
   border-radius: 999px;
 }
 
+.download-badge {
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.download-badge:hover,
+a.download-badge:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(42, 36, 32, 0.2);
+}
+
 .download-badge-logo {
   width: 38px;
   height: 38px;
