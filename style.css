@@ -742,6 +742,33 @@ a.download-badge:focus-visible {
   font-size: 0.95rem;
 }
 
+.qr-playstore {
+  margin: 1.2rem auto 0;
+  text-align: center;
+}
+
+.qr-playstore img {
+  display: block;
+  width: 180px;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.qr-playstore figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Sur téléphone, le visiteur touche directement le badge : le QR code est inutile */
+@media (max-width: 700px) {
+  .qr-playstore {
+    display: none;
+  }
+}
+
 footer {
   text-align: center;
   padding: 2.6rem 1.5rem 2.2rem;
