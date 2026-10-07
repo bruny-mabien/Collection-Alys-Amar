@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://bruny-mabien.github.io/Collection-Alys-Amar/sitemap.xml
+Sitemap: https://alysamar.com/sitemap.xml

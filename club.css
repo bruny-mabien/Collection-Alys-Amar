@@ -1,0 +1,54 @@
+/* Page Club littéraire — s'appuie sur les variables de style.css */
+.club-hero{text-align:center;padding:2.2rem 1rem 1.2rem}
+.club-hero .club-kicker{display:inline-block;border:2px solid var(--amber);border-radius:999px;padding:.3rem 1rem;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);font-weight:700}
+.club-hero .club-kicker b{color:var(--orange)}
+.club-hero h2{font-size:clamp(2rem,6vw,3.2rem);color:var(--teal);margin:.8rem 0 0;line-height:1.1}
+.club-hero h2 span{display:block;color:var(--orange)}
+.club-hero .club-devise{font-style:italic;font-size:1.2rem;color:var(--teal);margin:.6rem 0 1rem}
+.club-hero p.club-intro{max-width:46rem;margin:0 auto 1.2rem;font-size:1.05rem}
+.club-section{max-width:62rem;margin:2rem auto;padding:0 1rem}
+.club-section h3{color:var(--teal);font-size:1.5rem;margin:0 0 .6rem}
+.club-section h3 em{color:var(--orange);font-style:normal}
+.club-eyebrow{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);font-weight:700;margin:0 0 .4rem}
+.club-card{background:#fff;border:1px solid var(--bordure);border-radius:20px;padding:1.4rem 1.6rem;box-shadow:0 6px 18px rgba(11,91,100,.08)}
+.club-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.8rem}
+.club-chip{padding:.45rem 1rem;border-radius:999px;font-weight:600;font-size:.95rem;color:#fff;background:var(--teal)}
+.club-chip.o{background:var(--orange)}.club-chip.a{background:var(--amber);color:var(--encre)}
+.club-chips.soft .club-chip{font-weight:500;color:var(--encre);background:var(--teal-soft)}
+.club-chips.soft .club-chip.o{background:#fdeadb}.club-chips.soft .club-chip.a{background:#fdf1cf}
+.club-feature{background:linear-gradient(135deg,#0b5b64,#08454d);color:#fff;border-radius:24px;padding:1.8rem 1.8rem;display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap}
+.club-feature .club-eyebrow{color:var(--amber)}
+.club-feature h3{color:#fff;font-size:1.7rem}
+.club-feature h3 em{color:var(--amber)}
+.club-feature>div{flex:1 1 20rem}
+.club-feature p{margin:.4rem 0 0;opacity:.95}
+.club-covers{display:flex;gap:.6rem;flex:0 1 auto}
+.club-covers img{width:92px;border-radius:8px;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.club-quarters{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem;margin-top:.8rem}
+.club-q{background:#fff;border-radius:16px;border-top:6px solid var(--teal);padding:1rem 1.1rem;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.club-q:nth-child(2){border-color:var(--orange)}.club-q:nth-child(3){border-color:var(--amber)}
+.club-q small{letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--teal);font-size:.72rem}
+.club-q h4{margin:.2rem 0 .3rem;font-size:1.3rem;color:var(--teal)}
+.club-q p{margin:0;font-size:.92rem;color:#555}
+.club-values{text-align:center;letter-spacing:.14em;text-transform:uppercase;font-size:.8rem;color:var(--teal);font-weight:600}
+.club-values i{color:var(--amber);font-style:normal;margin:0 .5rem}
+/* Formulaire */
+#inscription{scroll-margin-top:1rem}
+.club-form{background:#fff;border:1px solid var(--bordure);border-radius:22px;padding:1.6rem;box-shadow:0 8px 24px rgba(11,91,100,.1)}
+.club-form fieldset{border:0;margin:0 0 1.2rem;padding:0}
+.club-form legend{font-weight:700;color:var(--teal);font-size:1.1rem;margin-bottom:.6rem;padding:0}
+.club-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.9rem}
+.club-form label{display:block;font-size:.9rem;font-weight:600;color:var(--encre)}
+.club-form label .req{color:var(--orange)}
+.club-form input[type=text],.club-form input[type=email],.club-form input[type=tel],.club-form input[type=number],.club-form select,.club-form textarea{width:100%;box-sizing:border-box;margin-top:.3rem;padding:.65rem .8rem;border:1.5px solid var(--bordure);border-radius:10px;font:inherit;background:var(--papier)}
+.club-form input:focus,.club-form select:focus,.club-form textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(11,91,100,.15)}
+.club-form textarea{min-height:6rem;resize:vertical}
+.club-form .club-check{display:flex;gap:.6rem;align-items:flex-start;font-weight:400;font-size:.92rem}
+.club-form .club-check input{margin-top:.25rem;flex:0 0 auto}
+.club-hp{position:absolute!important;left:-9999px;height:0;width:0;overflow:hidden}
+.club-submit{width:100%;border:0;cursor:pointer;font-size:1.05rem;padding:.9rem 1.4rem}
+.club-submit[disabled]{opacity:.6;cursor:wait}
+.club-msg{margin:1rem 0 0;padding:.9rem 1rem;border-radius:12px;font-weight:600;display:none}
+.club-msg.ok{display:block;background:#e3f4e8;color:#14532d}
+.club-msg.err{display:block;background:#fde8e6;color:#8a1c12}
+.club-note{font-size:.82rem;color:#666;margin-top:.8rem}

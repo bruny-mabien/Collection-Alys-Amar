@@ -2,24 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://bruny-mabien.github.io/Collection-Alys-Amar/</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://alysamar.com/</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://bruny-mabien.github.io/Collection-Alys-Amar/commander.html</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://alysamar.com/commander.html</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://bruny-mabien.github.io/Collection-Alys-Amar/confidentialite.html</loc>
-    <lastmod>2026-08-04</lastmod>
+    <loc>https://alysamar.com/confidentialite.html</loc>
+    <lastmod>2026-10-07</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://alysamar.com/club.html</loc>
+    <lastmod>2026-10-07</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
